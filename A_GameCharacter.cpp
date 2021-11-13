@@ -1,6 +1,4 @@
-
-
-
+//inclduing necessary header files.
 #include "A_GameCharacter.h"
 #include "AGun.h"
 #include "Components/CapsuleComponent.h"
@@ -9,7 +7,7 @@
 // Sets default values
 AA_GameCharacter::AA_GameCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this character to call Tick() every frame.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
@@ -18,7 +16,7 @@ AA_GameCharacter::AA_GameCharacter()
 void AA_GameCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	//setting up gun and health
 	Health = MaxHealth;
 	Gun = GetWorld()->SpawnActor<AAGun>(GunClass);
 	GetMesh()->HideBoneByName(TEXT("weapon_r"),EPhysBodyOp::PBO_None);
@@ -31,10 +29,9 @@ void AA_GameCharacter::BeginPlay()
 void AA_GameCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
-// Called to bind functionality to input
+// function for setting up inputs
 void AA_GameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -49,40 +46,50 @@ void AA_GameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("Shoot"),EInputEvent::IE_Pressed,this,&AA_GameCharacter::shoot);
 }
 
+//function responsible for moving forward.
 void AA_GameCharacter:: MoveForward(float AxisValue)
 {
 	AddMovementInput(GetActorForwardVector() * AxisValue);
 }
 
+//function responsible for moving Sidewards.
 void AA_GameCharacter:: MoveSideward(float AxisValue)
 {
 	AddMovementInput(GetActorRightVector() * AxisValue);
 }
 
+//function responsible for lookin up.
 void AA_GameCharacter:: LookUp(float AxisValue)
 {
 	AddControllerPitchInput(AxisValue);
 }
 
+//function responsible for looking down.
 void AA_GameCharacter:: LookSides(float AxisValue)
 {
 	AddControllerYawInput(AxisValue);
 }
 
+//function for shooting the gun.
 void AA_GameCharacter::shoot()
 {
+	//calling function inside the Gun script.
 	Gun->TriggerGun();
 }
 
+//function that returns whether the player is still alive.
 bool AA_GameCharacter :: IsDead() const
 {
 	return Health<=0;
 }
 
+//Function for dealing with damages
 float AA_GameCharacter :: TakeDamage(float DamageValue,struct FDamageEvent const &DamageEvent, class AController *EventInstigator, AActor *DamageCauser)
 {
+	//constructor
 	float DamageApplied = Super::TakeDamage(DamageValue, DamageEvent, EventInstigator, DamageCauser);
 	Health-=DamageApplied;
+	//if the player dies.
 	if(IsDead())
 	{
 		ATPShooterGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ATPShooterGameModeBase>();
